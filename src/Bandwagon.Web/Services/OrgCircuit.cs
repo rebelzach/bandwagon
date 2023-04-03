@@ -2,13 +2,13 @@
 
 namespace Bandwagon.Web.Services;
 
-public class OrgSession
+public class OrgCircuit : ISharedCircuit
 {
-    public OrgSession()
+    public OrgCircuit()
     {
     }
 
-    public event Action<OrgSession>? SessionUpdated;
+    public event Action<OrgCircuit>? Updated;
 
     private bool _groupingEnabled = true;
 
@@ -17,7 +17,7 @@ public class OrgSession
         set
         {
             _groupingEnabled = value;
-            SessionUpdated?.Invoke(this);
+            Updated?.Invoke(this);
         }
     }
 
@@ -27,7 +27,7 @@ public class OrgSession
         set
         {
             _org = value;
-            SessionUpdated?.Invoke(this);
+            Updated?.Invoke(this);
         }
     }
 }

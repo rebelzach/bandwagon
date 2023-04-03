@@ -11,6 +11,14 @@ public sealed class OrgUser
     //public Connection? ActivePowerupConnection { get; set; }
 }
 
+public static class OrgUserExtensions
+{
+    public static bool? IsAdmin(this OrgUser orgUser)
+    {
+        return orgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin");
+    }
+}
+
 public sealed class Role
 {
     public string? Id { get; set; }

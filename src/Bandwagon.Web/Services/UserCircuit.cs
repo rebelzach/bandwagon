@@ -2,13 +2,13 @@
 
 namespace Bandwagon.Web.Services;
 
-public class UserSession
+public class UserCircuit : ISharedCircuit
 {
-    public UserSession()
+    public UserCircuit()
     {
     }
 
-    public event Action<UserSession>? SessionUpdated;
+    public event Action<UserCircuit>? SessionUpdated;
 
     private bool _showGrouping = true;
 

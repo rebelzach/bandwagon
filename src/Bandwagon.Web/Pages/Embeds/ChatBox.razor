@@ -4,8 +4,8 @@
 @using Bandwagon.Web.Services
 @using Bandwagon.Web.Services.TruffleSDK;
 
-@inject UserSessionProvider SessionStore
-@inject OrgSessionProvider OrgSessionStore
+@inject UserCircuitProvider SessionStore
+@inject OrgCircuitProvider OrgSessionStore
 @inject Embed Embed
 @inject OrgClient OrgClient
 @inject UserClient UserClient
@@ -61,8 +61,8 @@ else
 
 @code {
 
-    UserSession? _userSession;
-    OrgSession? _orgSession;
+    UserCircuit? _userSession;
+    OrgCircuit? _orgSession;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -71,8 +71,8 @@ else
             return;
         }
 
-        _userSession = SessionStore.Get("test");
-        _orgSession = OrgSessionStore.Get("test");
+        _userSession = await SessionStore.GetAsync();
+        _orgSession = await OrgSessionStore.GetAsync();
 
         await OrgClient.SubscribeAsync(org =>
         {

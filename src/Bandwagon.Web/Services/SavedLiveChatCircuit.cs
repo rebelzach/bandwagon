@@ -4,11 +4,11 @@ using Microsoft.JSInterop;
 
 namespace Bandwagon.Web.Services;
 
-public class SavedLiveStream : ILiveStream, IDisposable
+public class PrerecordedLiveChatCircuit : ILiveChatCircuit, IDisposable, IPlayback
 {
     private const string ChatTranscriptPath = "";
 
-    public SavedLiveStream()
+    public PrerecordedLiveChatCircuit()
     {
     }
 

@@ -4,34 +4,34 @@ namespace Bandwagon.Web.Services;
 
 public class SharedCircuitRepository
 {
-    private readonly ConcurrentDictionary<string, OrgSession> _sessions = new();
+    private readonly ConcurrentDictionary<(Type SharedCircuitType, string Id), object> _sharedCircuts = new();
     private readonly IServiceProvider _provider;
 
     public SharedCircuitRepository(
-        IServiceProvider provider,
-        UserSessionProvider userSessionProvider)
+        IServiceProvider provider)
     {
         _provider = provider;
     }
 
-    public OrgSession Get(string orgId)
+    public TCircuit GetOrCreate<TCircuit>(string id) where TCircuit : notnull, ISharedCircuit
     {
-        if (_sessions.TryGetValue(orgId, out var session))
+        var key = (typeof(TCircuit), id);
+        if (_sharedCircuts.TryGetValue(key, out var circuit))
         {
-            return session;
+            return (TCircuit)circuit;
         }
 
-        session = _provider.GetRequiredService<OrgSession>();
+        circuit = _provider.GetRequiredService<TCircuit>();
 
-        if (_sessions.TryAdd(orgId, session))
+        if (_sharedCircuts.TryAdd(key, circuit))
         {
-            return session;
+            return (TCircuit)circuit;
         }
 
-        // Thread battle lost, get actual session
-        if (_sessions.TryGetValue(orgId, out session))
+        // Thread battle lost, get actual circuit
+        if (_sharedCircuts.TryGetValue(key, out circuit))
         {
-            return session;
+            return (TCircuit)circuit;
         }
 
         throw new InvalidOperationException("Couldnt't get session");

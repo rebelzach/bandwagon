@@ -13,10 +13,19 @@ public class VideoPlayer : IAsyncDisposable
         _js = js;
     }
 
-    public async Task CreateTestVideoPlayerAsync(string elementId)
+    public async Task CreateTestVideoPlayerAsync(string elementId, IPlayback? playbackListener)
     {
         var videoJs = await GetOrCreateVideoJsAsync();
-        await videoJs.InvokeVoidAsync("createTestVideoPlayer", elementId);
+        if (playbackListener is not null)
+        {
+            // TODO: fix memory leak of listener
+            var listener = DotNetObjectReference.Create(playbackListener);
+            await videoJs.InvokeVoidAsync("createTestVideoPlayer", elementId, listener);
+        }
+        else
+        {
+            await videoJs.InvokeVoidAsync("createTestVideoPlayer", elementId);
+        }
     }
 
     public async Task<double> GetCurrentTimeAsync()

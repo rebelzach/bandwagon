@@ -9,29 +9,25 @@
 @using TwitchLib.Client.Models;
 @using Bandwagon.Web.Services;
 
-@inject IJSRuntime JS
-@inject VideoPlayer VideoPlayer
-@inject OrgSessionProvider OrgSessionStore
-@inject UserSessionProvider SessionStore
+@inject UserCircuitProvider SessionStore
 @inject GroupedMessageCollector MessageCollector
 
-
-<div id="vod" style="position:absolute; right:0; top: 0;"></div>
+<HackathonSampleVideo />
 
 <div style="position: absolute; bottom:0; right:0;">
-
     @*<div>
     Threshold:
     <input @bind="threshold" type="range" max="1" min="0" step="0.05">
     @threshold
     </div>
     *@
-    <div>
+@*    <div>
     Time:
     <input width="500" @bind="timestamp" type="range" max="@endTime" min="@startTime" step="1000">
     @timestamp
     </div>
-    <button @onclick="Sync">Sync</button>
+*@
+@*<button @onclick="Sync">Sync</button>*@
     @*<div>
     Period (s):
     <input width="500" @bind="periodSecs" type="range" max="30" min="1">
@@ -94,8 +90,8 @@
 @code {
     List<StoredChatMessage> messages = new List<StoredChatMessage>();
 
-    UserSession? _userSession;
-    OrgSession? _orgSession;
+    UserCircuit? _userSession;
+    OrgCircuit? _orgSession;
 
     double threshold = 1;
 
@@ -130,43 +126,43 @@
             return;
         }
 
-        _userSession = SessionStore.Get("test");
-        _userSession.SessionUpdated += s =>
-        {
-            InvokeAsync(() => StateHasChanged());
-        };
+        //_userSession = SessionStore.Get("test");
+        //_userSession.SessionUpdated += s =>
+        //{
+        //    InvokeAsync(() => StateHasChanged());
+        //};
 
-        _orgSession = OrgSessionStore.Get("test");
-        _orgSession.SessionUpdated += s =>
-        {
-            InvokeAsync(() => StateHasChanged());
-        };
+        //_orgSession = OrgSessionStore.Get("test");
+        //_orgSession.Updated += s =>
+        //{
+        //    InvokeAsync(() => StateHasChanged());
+        //};
 
-        await VideoPlayer.CreateTestVideoPlayerAsync("vod");
+        //await VideoPlayer.CreateTestVideoPlayerAsync("vod");
 
-        @*var json = await File.ReadAllTextAsync(@"C:\Projects\the-hive-mind\data\chat5.json");*@
-        var json = await File.ReadAllTextAsync(@"C:\Temp\chat5.json");
-        messages = JsonConvert.DeserializeObject<List<StoredChatMessage>>(json) ?? throw new NullReferenceException();
-        @*startTime = messages.Where(m => m is not null).MinBy(m => m.TmiSentTs)!.TmiSentTs;*@
-        // "Message": "just like a DND party pcrowGiggle",
-        // "TmiSentTs": "1676325886126",
-        // VOD: 01:02:10
-        @* chat1 timestamp = 1675383350799;*@
+        //@*var json = await File.ReadAllTextAsync(@"C:\Projects\the-hive-mind\data\chat5.json");*@
+        //var json = await File.ReadAllTextAsync(@"C:\Temp\chat5.json");
+        //messages = JsonConvert.DeserializeObject<List<StoredChatMessage>>(json) ?? throw new NullReferenceException();
+        //@*startTime = messages.Where(m => m is not null).MinBy(m => m.TmiSentTs)!.TmiSentTs;*@
+        //// "Message": "just like a DND party pcrowGiggle",
+        //// "TmiSentTs": "1676325886126",
+        //// VOD: 01:02:10
+        //@* chat1 timestamp = 1675383350799;*@
+        ////timestamp = startTime;
+        //startTime = 1676325886126L - (long)TimeSpan.Parse("01:02:10.500").TotalMilliseconds;
         //timestamp = startTime;
-        startTime = 1676325886126L - (long)TimeSpan.Parse("01:02:10.500").TotalMilliseconds;
-        timestamp = startTime;
 
-        endTime = messages.Where(m => m is not null).MaxBy(m => m.TmiSentTs)!.TmiSentTs;
-        await Update();
+        //endTime = messages.Where(m => m is not null).MaxBy(m => m.TmiSentTs)!.TmiSentTs;
+        //await Update();
     }
 
-    async Task Sync()
-    {
-        var elapsedSecs = await VideoPlayer.GetCurrentTimeAsync();
-        timestamp = startTime + (long)(elapsedSecs * 1000.0) + 8000;
-        MessageCollector.Reset();
-        didSync = true;
-    }
+    //async Task Sync()
+    //{
+    //    var elapsedSecs = await VideoPlayer.GetCurrentTimeAsync();
+    //    timestamp = startTime + (long)(elapsedSecs * 1000.0) + 8000;
+    //    MessageCollector.Reset();
+    //    didSync = true;
+    //}
 
     async Task Update()
     {

@@ -1,8 +1,34 @@
-﻿@using Bandwagon.Web.Services;
+﻿@using Bandwagon.Web.Models.TruffleSDK;
+@using Bandwagon.Web.Services;
 
-@inject LiveStreamProvider LiveStreamProvider
-@inject OrgSessionProvider OrgSessionProvider
-@inject UserSessionProvider OrgSessionProvider
+@inject LiveChatCircuitProvider LiveChatProvider
+@inject UserCircuitProvider UserCircuitProvider
+@inject VideoPlayer VideoPlayer
+
+<div id="vod" style="position:absolute; right:0; top: 0;"></div>
+
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
 
+        var userCircuit = await UserCircuitProvider.GetAsync();
+        IPlayback? chatPlayback = null;
+
+        // Admin users can control playback
+        if (userCircuit.OrgUser?.IsAdmin() ?? false)
+        {
+            var chatCircuit = await LiveChatProvider.GetAsync();
+            if (chatCircuit is PrerecordedLiveChatCircuit prerecordedChat)
+            {
+                prerecordedChat.EnsureLoaded();
+                chatPlayback = prerecordedChat;
+            }
+        }
+
+        await VideoPlayer.CreateTestVideoPlayerAsync("vod", chatPlayback);
+    }
 }
