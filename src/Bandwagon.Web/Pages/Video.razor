@@ -1,0 +1,218 @@
+﻿
+@page "/embed/video"
+
+@using System.Diagnostics;
+@using Bandwagon.Web.Models;
+@using F23.StringSimilarity;
+@using Newtonsoft.Json;
+@using System.Text;
+@using TwitchLib.Client.Models;
+@using Bandwagon.Web.Services;
+
+@inject IJSRuntime JS
+@inject VideoPlayer VideoPlayer
+@inject OrgSessionProvider OrgSessionStore
+@inject UserSessionProvider SessionStore
+@inject GroupedMessageCollector MessageCollector
+
+
+<div id="vod" style="position:absolute; right:0; top: 0;"></div>
+
+<div style="position: absolute; bottom:0; right:0;">
+
+    @*<div>
+    Threshold:
+    <input @bind="threshold" type="range" max="1" min="0" step="0.05">
+    @threshold
+    </div>
+    *@
+    <div>
+    Time:
+    <input width="500" @bind="timestamp" type="range" max="@endTime" min="@startTime" step="1000">
+    @timestamp
+    </div>
+    <button @onclick="Sync">Sync</button>
+    @*<div>
+    Period (s):
+    <input width="500" @bind="periodSecs" type="range" max="30" min="1">
+    @periodSecs
+    </div>
+    <div>
+    Count:
+    @recentMessages.Count
+    </div>
+    *@
+</div>
+
+@{
+    var visibility = "";
+    if (_orgSession?.GroupingEnabled != true || _userSession?.ShowGrouping != true)
+        visibility = "visibility: hidden;";
+}
+
+<div class="groups" style="@visibility">
+    @{
+        var slotIndex = 1;
+    }
+    @foreach (var group in MessageCollector.Groups)
+    {
+        var cooldownMs = 10000.0;
+        var opacity = (cooldownMs - (timestamp - group.LastMessageAddedAt)) / cooldownMs;
+        if (opacity < 0.0)
+        {
+            continue;
+        }
+
+        <div @key="group.Id" class="group slot-@slotIndex" style="opacity: @opacity;">
+            <div class="group-inner">
+                @foreach (var scoredMessage in group.Messages.TakeLast(3))
+                {
+                    var message = scoredMessage.Message;
+                    <div class="grouped-message" style="opacity: @opacity;">
+                        <span class="grouped-message--name">@message.DisplayName:</span>
+                        <span class="grouped-message--text">@ReplaceEmotes(message)</span>
+                    </div>
+                }
+            </div>
+            <div class="group-count" style="opacity: @opacity;">x@(group.Messages.Count)</div>
+        </div>
+        ++slotIndex;
+    }
+</div>
+
+<div class="chat-box">
+    <div class="chat-box-inner">
+        @foreach (var message in MessageCollector.RecentMessages.Take(10))
+        {
+            <div style="border: solid #000 1px;">
+                <div>@*@(TimeSpan.FromMilliseconds(message.TmiSentTs - startTime)) *@ @message.DisplayName: @ReplaceEmotes(message)</div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    List<StoredChatMessage> messages = new List<StoredChatMessage>();
+
+    UserSession? _userSession;
+    OrgSession? _orgSession;
+
+    double threshold = 1;
+
+    long startTime;
+    long endTime;
+    long timestamp;
+    long periodSecs = 5;
+
+    bool didSync;
+
+    DateTime? LastTick;
+
+    private MarkupString ReplaceEmotes(StoredChatMessage m)
+    {
+        var s = m.Message;
+        var p = 0;
+        var b = new StringBuilder();
+        foreach (var e in m.EmoteSet.Emotes.OrderBy(e => e.StartIndex))
+        {
+            b.Append(s[p..((int)e.StartIndex)]);
+            b.Append($"<img class='message-emote' src='{e.ImageUrl}'>");
+            p = (int)e.EndIndex + 1;
+        }
+        b.Append(s[p..]);
+        return (MarkupString)b.ToString();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _userSession = SessionStore.Get("test");
+        _userSession.SessionUpdated += s =>
+        {
+            InvokeAsync(() => StateHasChanged());
+        };
+
+        _orgSession = OrgSessionStore.Get("test");
+        _orgSession.SessionUpdated += s =>
+        {
+            InvokeAsync(() => StateHasChanged());
+        };
+
+        await VideoPlayer.CreateTestVideoPlayerAsync("vod");
+
+        @*var json = await File.ReadAllTextAsync(@"C:\Projects\the-hive-mind\data\chat5.json");*@
+        var json = await File.ReadAllTextAsync(@"C:\Temp\chat5.json");
+        messages = JsonConvert.DeserializeObject<List<StoredChatMessage>>(json) ?? throw new NullReferenceException();
+        @*startTime = messages.Where(m => m is not null).MinBy(m => m.TmiSentTs)!.TmiSentTs;*@
+        // "Message": "just like a DND party pcrowGiggle",
+        // "TmiSentTs": "1676325886126",
+        // VOD: 01:02:10
+        @* chat1 timestamp = 1675383350799;*@
+        //timestamp = startTime;
+        startTime = 1676325886126L - (long)TimeSpan.Parse("01:02:10.500").TotalMilliseconds;
+        timestamp = startTime;
+
+        endTime = messages.Where(m => m is not null).MaxBy(m => m.TmiSentTs)!.TmiSentTs;
+        await Update();
+    }
+
+    async Task Sync()
+    {
+        var elapsedSecs = await VideoPlayer.GetCurrentTimeAsync();
+        timestamp = startTime + (long)(elapsedSecs * 1000.0) + 8000;
+        MessageCollector.Reset();
+        didSync = true;
+    }
+
+    async Task Update()
+    {
+        while (true)
+        {
+            foreach (var message in messages)
+            {
+                var tooOldTimestamp = timestamp - (30 * 1000);
+                if (message.TmiSentTs < tooOldTimestamp)
+                {
+                    continue;
+                }
+
+                while (message.TmiSentTs > timestamp)
+                {
+                    if (didSync)
+                    {
+                        break;
+                    }
+                    await Task.Delay(100);
+                    await UpdateTimestamp();
+                    StateHasChanged();
+                }
+                if (didSync)
+                {
+                    didSync = false;
+                    break;
+                }
+                MessageCollector.ReceiveMessage(message);
+                StateHasChanged();
+
+                await UpdateTimestamp();
+            }
+        }
+    }
+
+    async Task UpdateTimestamp()
+    {
+        var now = DateTime.Now;
+
+        LastTick ??= now;
+        timestamp += (long)(now - LastTick.Value).TotalMilliseconds;
+
+        LastTick = now;
+        //await Sync();
+
+        await Task.Yield();
+    }
+}

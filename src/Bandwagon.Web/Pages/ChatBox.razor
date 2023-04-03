@@ -1,0 +1,107 @@
+﻿
+@page "/embed/chat-box"
+
+@using Bandwagon.Web.Services
+@using Bandwagon.Web.Services.TruffleSDK;
+
+@inject UserSessionProvider SessionStore
+@inject OrgSessionProvider OrgSessionStore
+@inject Embed Embed
+@inject OrgClient OrgClient
+@inject UserClient UserClient
+
+@*<style>
+    body {
+        background-color: transparent;
+    }
+</style>
+*@
+
+@if (_orgSession is null || _userSession?.OrgUser is null)
+{
+    return;
+}
+
+@if (_userSession.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
+{
+    <div>
+        Streamer
+    </div>
+    <label>
+        <input type="checkbox" @bind="_orgSession.GroupingEnabled" /> Enable Grouping 
+    </label>
+}
+else
+{
+    <div>
+        Chatter
+    </div>
+    <label>
+    <input type="checkbox" @bind="_userSession.ShowGrouping" /> Show Grouping 
+    </label>
+}
+
+@*
+
+{
+  "url": "https://localhost:7127/embed",
+  "authToken": "AUTH_TOKEN",
+  "contentPageType": "youtubeVideo",
+  "parentQuerySelector": "ytd-watch-flexy #movie_player",
+  "defaultStyles": {
+    "width": "100%",
+    "height": "100%",
+    "z-index": "999",
+    "position": "absolute",
+    "pointer-events": "none"
+  }
+}
+
+*@
+
+@code {
+
+    UserSession? _userSession;
+    OrgSession? _orgSession;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _userSession = SessionStore.Get("test");
+        _orgSession = OrgSessionStore.Get("test");
+
+        await OrgClient.SubscribeAsync(org =>
+        {
+            InvokeAsync(() => 
+            {
+                _orgSession.Org = org;
+                StateHasChanged();
+            });
+        });
+
+        await UserClient.SubscribeUserAsync(user =>
+        {
+            InvokeAsync(() => 
+            {
+                _userSession.User = user;
+                StateHasChanged();
+            });
+        });
+
+        await UserClient.SubscribeOrgUserAsync(user =>
+        {
+            InvokeAsync(() => 
+            {
+                _userSession.OrgUser = user;
+                StateHasChanged();
+            });
+        });
+
+        StateHasChanged();
+    }
+}
+

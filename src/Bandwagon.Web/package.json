@@ -1,0 +1,14 @@
+{
+  "name": "chat-web",
+  "version": "1.0.0",
+  "description": "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=yuowmdo3odmjrle2m37ugnb53509xc&redirect_uri=https://jwt.ms/&scope=chat%3Aread",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@trufflehq/sdk": "^0.1.2"
+  }
+}
