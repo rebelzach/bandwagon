@@ -15,7 +15,7 @@ public class MessageCorrelator
     //var algorithm = new QGram(4);
 
     public MessageGroup? CorrelateNewMessage(
-        StoredChatMessage testMessage, List<StoredChatMessage> messages, double distanceThreshold, int countThreshold)
+        IChatMessage testMessage, List<IChatMessage> messages, double distanceThreshold, int countThreshold)
     {
         var matches = messages
             .Select(m => new ScoredMessage(m, _algorithm.Distance(testMessage.Message.ToLowerInvariant(), m.Message.ToLowerInvariant())))
@@ -43,7 +43,7 @@ public class MessageCorrelator
         return null;
     }
 
-    public MessageGroup? TryCorrelateWithGroup(StoredChatMessage testMessage, MessageGroup group, double distanceThreshold)
+    public MessageGroup? TryCorrelateWithGroup(IChatMessage testMessage, MessageGroup group, double distanceThreshold)
     {
         var allMatch = group.Messages
             .Select(m => m.Message)

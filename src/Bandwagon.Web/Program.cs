@@ -8,8 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped<GroupedMessageCollector>();
-builder.Services.AddScoped<MessageCorrelator>();
+builder.Services.AddTransient<GroupedMessageCollector>();
 builder.Services.AddTransient<MessageCorrelator>();
 
 builder.Services.AddSingleton<SharedCircuitRepository>();

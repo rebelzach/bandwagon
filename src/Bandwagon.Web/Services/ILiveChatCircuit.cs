@@ -3,5 +3,7 @@
 namespace Bandwagon.Web.Services;
 public interface ILiveChatCircuit : ISharedCircuit
 {
-    event Action<StoredChatMessage>? ChatMessageRecieved;
+    GroupedMessageCollector Messages { get; }
+
+    event Action? Updated;
 }

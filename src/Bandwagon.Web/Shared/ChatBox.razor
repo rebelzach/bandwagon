@@ -1,0 +1,32 @@
+﻿
+@inject LiveChatCircuitProvider LiveChatProvider
+@inject UserCircuitProvider UserCircuitProvider
+
+<div class="chat-box">
+    <div class="chat-box-inner">
+        @if (LiveChat?.Messages is not null)
+        {
+            @foreach (var message in LiveChat.Messages.RecentMessages.Take(10))
+            {
+                <div style="border: solid #000 1px;">
+                    @*<div>message.DisplayName: @ReplaceEmotes(message)</div>*@
+                    <div>message.DisplayName: message</div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    ILiveChatCircuit? LiveChat;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        LiveChat = await LiveChatProvider.GetAsync();
+
+        LiveChat.Updated += () => InvokeAsync(() => StateHasChanged());
+    }
+}

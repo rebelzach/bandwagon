@@ -24,7 +24,7 @@
             var chatCircuit = await LiveChatProvider.GetAsync();
             if (chatCircuit is PrerecordedLiveChatCircuit prerecordedChat)
             {
-                prerecordedChat.EnsureLoaded();
+                await prerecordedChat.EnsureLoadedAsync();
                 chatPlayback = prerecordedChat;
             }
         }
