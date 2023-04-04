@@ -1,6 +1,13 @@
 
+* {
+    box-sizing: border-box;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100%;
+    padding: 8px;
+    margin: 0;
 }
 
 h1:focus {
@@ -218,7 +225,7 @@ a, .btn-link {
     top: 320px;
     left: 900px;
 }
-
+/*
 .chat-box {
     position: absolute;
     pointer-events: none;
@@ -229,6 +236,11 @@ a, .btn-link {
     overflow: hidden;
     background: black;
     color: #fff;
+}
+*/
+.chat-box {
+    position: relative;
+    flex: 1;
 }
 
 .group-count {
@@ -243,4 +255,15 @@ a, .btn-link {
 .chat-box-inner {
     position: absolute;
     bottom: 0;
+}
+
+#embed-above-the-fold {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    height: 100%;
+}
+
+#embed-above-the-fold > * {
+
 }

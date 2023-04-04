@@ -1,8 +1,4 @@
-﻿
-@page "/embed/above-fold"
-
-@using Bandwagon.Web.Services
-@using Bandwagon.Web.Services.TruffleSDK;
+﻿@page "/embed/above-fold"
 
 @inject UserCircuitProvider SessionStore
 @inject OrgCircuitProvider OrgSessionStore
@@ -10,56 +6,34 @@
 @inject IOrgClient OrgClient
 @inject IUserClient UserClient
 
-@*<style>
-    body {
-        background-color: transparent;
-    }
-</style>
-*@
-
 @if (_orgSession is null || _userSession?.OrgUser is null)
 {
     return;
 }
 
-@if (_userSession.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
-{
+<div id="embed-above-the-fold">
+    <ChatBox />
     <div>
-        Streamer
+        @if (_userSession.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
+        {
+            <div>
+                Streamer
+            </div>
+            <label>
+                <input type="checkbox" @bind="_orgSession.GroupingEnabled" /> Enable Grouping
+            </label>
+        }
+        else
+        {
+            <div>
+                Chatter
+            </div>
+            <label>
+                <input type="checkbox" @bind="_userSession.ShowGrouping" /> Show Grouping
+            </label>
+        }
     </div>
-    <label>
-        <input type="checkbox" @bind="_orgSession.GroupingEnabled" /> Enable Grouping 
-    </label>
-}
-else
-{
-    <div>
-        Chatter
-    </div>
-    <label>
-    <input type="checkbox" @bind="_userSession.ShowGrouping" /> Show Grouping 
-    </label>
-}
-
-<ChatBox />
-
-@*
-
-{
-  "url": "https://localhost:7127/embed",
-  "authToken": "AUTH_TOKEN",
-  "contentPageType": "youtubeVideo",
-  "parentQuerySelector": "ytd-watch-flexy #movie_player",
-  "defaultStyles": {
-    "width": "100%",
-    "height": "100%",
-    "z-index": "999",
-    "position": "absolute",
-    "pointer-events": "none"
-  }
-}
-
-*@
+</div>
 
 @code {
 
@@ -78,7 +52,7 @@ else
 
         await OrgClient.SubscribeAsync(org =>
         {
-            InvokeAsync(() => 
+            InvokeAsync(() =>
             {
                 _orgSession.Org = org;
                 StateHasChanged();
@@ -87,7 +61,7 @@ else
 
         await UserClient.SubscribeUserAsync(user =>
         {
-            InvokeAsync(() => 
+            InvokeAsync(() =>
             {
                 _userSession.User = user;
                 StateHasChanged();
@@ -96,7 +70,7 @@ else
 
         await UserClient.SubscribeOrgUserAsync(user =>
         {
-            InvokeAsync(() => 
+            InvokeAsync(() =>
             {
                 _userSession.OrgUser = user;
                 StateHasChanged();
