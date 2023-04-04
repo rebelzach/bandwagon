@@ -4,7 +4,7 @@ using Microsoft.JSInterop;
 
 namespace Bandwagon.Web.Services.TruffleSDK;
 
-public class UserClient
+public class UserClient : IUserClient
 {
     private IJSObjectReference? _orgHelper;
     private DotNetObjectReference<UserClient>? _thisRef;

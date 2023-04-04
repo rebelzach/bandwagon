@@ -2,7 +2,7 @@
 
 namespace Bandwagon.Web.Services.TruffleSDK;
 
-public class Embed
+public class Embed : IEmbed
 {
     private IJSObjectReference? _sdkModule;
     private readonly IJSRuntime _js;

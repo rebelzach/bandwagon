@@ -38,6 +38,7 @@
         visibility = "visibility: hidden;";
 }
 
+@*
 <div class="groups" style="@visibility">
     @{
         var slotIndex = 1;
@@ -67,17 +68,7 @@
         ++slotIndex;
     }
 </div>
-
-<div class="chat-box">
-    <div class="chat-box-inner">
-        @foreach (var message in MessageCollector.RecentMessages.Take(10))
-        {
-            <div style="border: solid #000 1px;">
-                <div>@*@(TimeSpan.FromMilliseconds(message.TmiSentTs - startTime)) *@ @message.DisplayName: @ReplaceEmotes(message)</div>
-            </div>
-        }
-    </div>
-</div>
+*@
 
 @code {
     List<StoredChatMessage> messages = new List<StoredChatMessage>();

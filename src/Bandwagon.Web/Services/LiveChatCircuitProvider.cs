@@ -6,11 +6,11 @@ namespace Bandwagon.Web.Services;
 public class LiveChatCircuitProvider
 {
     private readonly SharedCircuitRepository _circuitRepository;
-    private readonly OrgClient _orgClient;
+    private readonly IOrgClient _orgClient;
 
     public LiveChatCircuitProvider(
         SharedCircuitRepository circuitRepository,
-        OrgClient orgClient)
+        IOrgClient orgClient)
     {
         this._circuitRepository = circuitRepository;
         this._orgClient = orgClient;

@@ -8,9 +8,9 @@
         {
             @foreach (var message in LiveChat.Messages.RecentMessages.Take(10))
             {
-                <div style="border: solid #000 1px;">
+                <div>
                     @*<div>message.DisplayName: @ReplaceEmotes(message)</div>*@
-                    <div>message.DisplayName: message</div>
+                    <div>@message.DisplayName: @message.Message</div>
                 </div>
             }
         }

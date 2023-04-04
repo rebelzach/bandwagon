@@ -1,7 +1,6 @@
 ﻿using Bandwagon.Web.Services;
 using Bandwagon.Web.Services.TruffleSDK;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Bandwagon.Web.Services.TruffleSDK.Mocks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +18,20 @@ builder.Services.AddScoped<UserCircuitProvider>();
 builder.Services.AddTransient<ILiveChatCircuit, PrerecordedLiveChatCircuit>();
 builder.Services.AddScoped<LiveChatCircuitProvider>();
 builder.Services.AddScoped<VideoPlayer>();
-builder.Services.AddScoped<Embed>();
-builder.Services.AddScoped<UserClient>();
-builder.Services.AddScoped<OrgClient>();
+
+var useMocks = true;
+if (useMocks)
+{
+    builder.Services.AddScoped<IEmbed, MockEmbed>();
+    builder.Services.AddScoped<IUserClient, MockUserClient>();
+    builder.Services.AddScoped<IOrgClient, MockOrgClient>();
+}
+else
+{
+    builder.Services.AddScoped<IEmbed, Embed>();
+    builder.Services.AddScoped<IUserClient, UserClient>();
+    builder.Services.AddScoped<IOrgClient, OrgClient>();
+}
 
 var app = builder.Build();
 

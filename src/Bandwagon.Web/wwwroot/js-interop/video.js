@@ -14,15 +14,12 @@ export function createTestVideoPlayer(elementId, dotNetListener) {
     player.setVolume(0.5);
     if (dotNetListener) {
         player.addEventListener(Twitch.Player.SEEK, e => {
-            console.log(Twitch.Player.SEEK, e);
             dotNetListener.invokeMethodAsync("SetPosition", e.position);
         });
         player.addEventListener(Twitch.Player.PLAY, e => {
-            console.log(Twitch.Player.PLAY, e);
             dotNetListener.invokeMethodAsync("Play", e.position);
         });
         player.addEventListener(Twitch.Player.PAUSE, e => {
-            console.log(Twitch.Player.PAUSE, e);
             dotNetListener.invokeMethodAsync("Pause", e.position);
         });
     }

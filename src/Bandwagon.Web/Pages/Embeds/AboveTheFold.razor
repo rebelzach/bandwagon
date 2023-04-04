@@ -1,14 +1,14 @@
 ﻿
-@page "/embed/chat-box"
+@page "/embed/above-fold"
 
 @using Bandwagon.Web.Services
 @using Bandwagon.Web.Services.TruffleSDK;
 
 @inject UserCircuitProvider SessionStore
 @inject OrgCircuitProvider OrgSessionStore
-@inject Embed Embed
-@inject OrgClient OrgClient
-@inject UserClient UserClient
+@inject IEmbed Embed
+@inject IOrgClient OrgClient
+@inject IUserClient UserClient
 
 @*<style>
     body {

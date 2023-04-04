@@ -7,11 +7,11 @@ namespace Bandwagon.Web.Services;
 public class UserCircuitProvider
 {
     private readonly SharedCircuitRepository _circuitRepository;
-    private readonly UserClient userClient;
+    private readonly IUserClient userClient;
 
     public UserCircuitProvider(
         SharedCircuitRepository circuitRepository,
-        UserClient userClient)
+        IUserClient userClient)
     {
         this._circuitRepository = circuitRepository;
         this.userClient = userClient;

@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace Bandwagon.Web.Services.TruffleSDK;
 
-public class OrgClient
+public class OrgClient : IOrgClient
 {
     private IJSObjectReference? _orgHelper;
     private DotNetObjectReference<OrgClient>? _thisRef;
@@ -21,7 +21,7 @@ public class OrgClient
     {
         if (!_isSubscribed)
         {
-           _isSubscribed = true;
+            _isSubscribed = true;
             _orgHelper = await _js.InvokeAsync<IJSObjectReference>("import", "/js-interop/org-helper.js");
             _thisRef = DotNetObjectReference.Create(this);
             await _orgHelper.InvokeVoidAsync("subscribe", _thisRef);
