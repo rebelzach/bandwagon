@@ -162,10 +162,12 @@ a, .btn-link {
 
 @keyframes circle {
     0% {
+        opacity: 1;
         transform: rotate(0deg) translate(-165px) rotate(0deg);
     }
 
     100% {
+        opacity: 1;
         transform: rotate(360deg) translate(-165px) rotate(-360deg);
     }
 }
@@ -319,7 +321,8 @@ a, .btn-link {
 {
     top: 200px;
     left: 400px;
-    animation: circle 6s linear infinite, disco 8s linear infinite;
+    animation: circle 6s linear, disco 8s linear infinite;
+    opacity: 0;
 }
 
 .dancing .slot-1 {
@@ -327,22 +330,27 @@ a, .btn-link {
 
 .dancing .slot-2 {
     animation-delay: -1s;
+    animation-delay: 1s;
 }
 
 .dancing .slot-3 {
     animation-delay: -2s;
+    animation-delay: 2s;
 }
 
 .dancing .slot-4 {
     animation-delay: -3s;
+    animation-delay: 3s;
 }
 
 .dancing .slot-5 {
     animation-delay: -4s;
+    animation-delay: 4s;
 }
 
 .dancing .slot-6 {
     animation-delay: -5s;
+    animation-delay: 5s;
 }
 
 .slot-7 {

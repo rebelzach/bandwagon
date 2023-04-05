@@ -22,19 +22,21 @@
         {
             continue;
         }
+        var style = $"opacity: {opacity};";
+        style = "";// For dancing, add individual messages and set the animation delay as an offset, might be good as separate component limit to only first emote and name
 
-        <div @key=group class="group slot-@slotIndex" style="opacity: @opacity;">
+        <div @key=group class="group slot-@slotIndex" style="@style">
             <div class="group-inner">
                 @foreach (var collectedMessage in group.Messages.TakeLast(10))
                 {
                     var message = collectedMessage.Message;
-                    <div @key="collectedMessage" class="grouped-message slide-in-bottom" style="opacity: @opacity;">
+                    <div @key="collectedMessage" class="grouped-message slide-in-bottom" style="@style">
                         <span class="grouped-message--name">@message.DisplayName:</span>
                         <span class="grouped-message--text">@ReplaceEmotes(message)</span>
                     </div>
                 }
             </div>
-            <div class="group-count" style="opacity: @opacity;">x@(group.Messages.Count)</div>
+            <div class="group-count" style="@style">x@(group.Messages.Count)</div>
         </div>
         ++slotIndex;
     }
