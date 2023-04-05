@@ -1,5 +1,73 @@
-﻿<h3>ChatBox</h3>
+﻿
+@inject LiveChatCircuitProvider LiveChatProvider
+
+@{
+    if (LiveChat is null)
+        return;
+
+    var visibilityStyle = "";
+    if (!Visible)
+        visibilityStyle = "display: none;";
+}
+
+<div class="groups" style="@visibilityStyle">
+    @{
+        var slotIndex = 1;
+    }
+    @foreach (var group in LiveChat.Messages.Groups)
+    {
+        var cooldownMs = 10000.0;
+        var opacity = (cooldownMs - (LiveChat.CurrentTimestampMs - group.LastMessageAddedAt)) / cooldownMs;
+        if (opacity < 0.0)
+        {
+            continue;
+        }
+
+        <div @key="group.Id" class="group slot-@slotIndex" style="opacity: @opacity;">
+            <div class="group-inner">
+                @foreach (var scoredMessage in group.Messages.TakeLast(3))
+                {
+                    var message = scoredMessage.Message;
+                    <div class="grouped-message" style="opacity: @opacity;">
+                        <span class="grouped-message--name">@message.DisplayName:</span>
+                        <span class="grouped-message--text">@ReplaceEmotes(message)</span>
+                    </div>
+                }
+            </div>
+            <div class="group-count" style="opacity: @opacity;">x@(group.Messages.Count)</div>
+        </div>
+        ++slotIndex;
+    }
+</div>
 
 @code {
+    [Parameter]
+    public bool Visible { get; set; } = true;
 
+    ILiveChatCircuit? LiveChat;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        LiveChat = await LiveChatProvider.GetAsync();
+
+        LiveChat.Updated += () => InvokeAsync(() => StateHasChanged());
+    }
+
+    private MarkupString ReplaceEmotes(IChatMessage m)
+    {
+        var s = m.Message;
+        var p = 0;
+        var b = new StringBuilder();
+        foreach (var e in m.EmoteSet.Emotes.OrderBy(e => e.StartIndex))
+        {
+            b.Append(s[p..((int)e.StartIndex)]);
+            b.Append($"<img class='message-emote' src='{e.ImageUrl}'>");
+            p = (int)e.EndIndex + 1;
+        }
+        b.Append(s[p..]);
+        return (MarkupString)b.ToString();
+    }
 }

@@ -12,7 +12,10 @@
 }
 
 <div id="embed-above-the-fold">
-    <ChatBox />
+    <div id="chat-container">
+        <ChatGroups />
+        <ChatBox />
+    </div>
     <div>
         @if (_userSession.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
         {

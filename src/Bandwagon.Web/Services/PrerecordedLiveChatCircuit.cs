@@ -30,6 +30,8 @@ public class PrerecordedLiveChatCircuit : ILiveChatCircuit, IDisposable, IPlayba
 
     public GroupedMessageCollector Messages => _messageCollector;
 
+    public long CurrentTimestampMs => postitionMs;
+
     public async Task EnsureLoadedAsync()
     {
         if (_isLoaded) 
@@ -79,6 +81,7 @@ public class PrerecordedLiveChatCircuit : ILiveChatCircuit, IDisposable, IPlayba
                     }
                     await Task.Delay(50);
                     UpdateTimestamp();
+                    Updated?.Invoke(); // Render a frame
                 }
 
                 if (_isReloadQueued)

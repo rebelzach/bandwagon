@@ -6,18 +6,14 @@ public class GroupedMessageCollector
 {
     private readonly MessageCorrelator _messageCorrelator;
 
-
     List<IChatMessage> _recentMessages = new();
     public List<IChatMessage> RecentMessages => _recentMessages;
-
 
     List<MessageGroup> _groups = new();
     public List<MessageGroup> Groups => _groups;
 
     List<MessageGroup> _oldGroups = new();
     public List<MessageGroup> OldGroups => _oldGroups;
-
-    public event EventHandler? GroupsUpdated;
 
     long? _lastRecievedTs;
 
@@ -35,14 +31,12 @@ public class GroupedMessageCollector
     public void Reset()
     {
         _recentMessages.Clear();
-        _groups.Clear();
+        ReplaceGroups(new());
         _oldGroups.Clear();
     }
 
     public void ReceiveMessage(IChatMessage newMessage)
     {
-        if (newMessage.Message.Contains("hite", StringComparison.OrdinalIgnoreCase))
-            return;
         _lastRecievedTs = newMessage.TmiSentTs;
         var windowStart = _lastRecievedTs - ConsiderMessageForGroupingWindowSeconds * 1000;
 
@@ -50,18 +44,20 @@ public class GroupedMessageCollector
 
         var cooldownThresholdTime = newMessage.TmiSentTs - GroupCooldownSeconds * 1000;
 
-        foreach (var group in _groups.ToList())
+        var newGroups = _groups.ToList();
+
+        foreach (var group in newGroups.ToList())
         {
             if (group.LastMessageAddedAt < cooldownThresholdTime)
             {
                 _oldGroups.Add(group);
-                _groups.Remove(group);
+                newGroups.Remove(group);
                 continue;
             }
         }
 
         // Check to see if the message fits into any of the current groups.
-        foreach (var group in _groups.ToList())
+        foreach (var group in newGroups.ToList())
         {
             var updatedGroup = _messageCorrelator.TryCorrelateWithGroup(
                 newMessage,
@@ -70,7 +66,8 @@ public class GroupedMessageCollector
 
             if (updatedGroup is not null)
             {
-                _groups[_groups.IndexOf(group)] = updatedGroup;
+                newGroups[newGroups.IndexOf(group)] = updatedGroup;
+                ReplaceGroups(newGroups);
                 return;
             }
         }
@@ -86,11 +83,17 @@ public class GroupedMessageCollector
             foreach (var m in newGroup.Messages.Select(m => m.Message))
                 _recentMessages.Remove(m);
 
-            _groups.Add(newGroup);
+            newGroups.Add(newGroup);
+            ReplaceGroups(newGroups);
             return;
         }
 
         _recentMessages.Add(newMessage);
+    }
+
+    private void ReplaceGroups(List<MessageGroup> groups)
+    {
+        Interlocked.Exchange(ref _groups, groups);
     }
 }
 
