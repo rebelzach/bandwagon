@@ -6,8 +6,11 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     height: 100%;
-    padding: 8px;
     margin: 0;
+}
+
+body {
+    padding: 8px;
 }
 
 h1:focus {
@@ -121,6 +124,44 @@ a, .btn-link {
     }
 }
 
+/**
+ * ----------------------------------------
+ * animation slide-in-bottom
+ * ----------------------------------------
+ */
+
+@keyframes slide-in-bottom {
+    0% {
+        max-height: 0;
+    }
+
+    100% {
+        max-height: 100px;
+    }
+}
+
+@keyframes send-to-slot {
+    0% {
+        transform: translateY(0) translateX(50px);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(-500px) translateX(250px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+@keyframes collapse-message {
+    0% {
+        max-height: 100px;
+    }
+
+    100% {
+        max-height: 0;
+    }
+}
+
 .groups {
     position: relative;
     overflow: hidden;
@@ -138,11 +179,12 @@ a, .btn-link {
     color: #fff;
     text-shadow: #000 1px 0 20px;
     font-size: 16px;
-    /* box-shadow: 0px -2px 15px rgba(34,34,34,0.3);
-        background-color: rgba(34,34,34,0.1);*/
-
+/*    box-shadow: 0px -2px 15px rgba(34,34,34,0.3);
+        background-color: rgba(34,34,34,0.1);
+*/
     transition-property: left, top;
     transition-duration: 0.5s;
+
     overflow: hidden;
 }
 
@@ -151,17 +193,28 @@ a, .btn-link {
     transition-property: opacity;
     transition-duration: 0.3s;
     transition-timing-function: ease-in;
+
     width: 100%;
     padding: 20px;
     padding-right: 30px;
     padding-left: 10px;
     bottom: 0;
-    overflow: hidden;
+    /*overflow: hidden;*/
+}
+
+.grouped-message .grouped-message--text {
+    transition: font-size ease-in 0.2s;
+    font-size: 14px;
+    display: block;
 }
 
 .grouped-message:last-child .grouped-message--text {
-    font-size: 30px;
+    font-size: 34px;
     display: block;
+}
+
+.group .slide-in-bottom {
+    animation: slide-in-bottom 0.5s cubic-bezier(.42,.06,.38,.44) both;
 }
 
 .slot-1 {
@@ -223,19 +276,23 @@ a, .btn-link {
     top: 320px;
     left: 900px;
 }
-/*
-.chat-box {
+
+.send-to-group {
+    animation: send-to-slot 1s cubic-bezier(.66,0,.91,.34) both;
     position: absolute;
-    pointer-events: none;
-    height: 200px;
-    width: 300px;
-    bottom: 240px;
-    left: 10px;
-    overflow: hidden;
-    background: black;
-    color: #fff;
+    z-index: 999;
+    display: none;
 }
-*/
+
+.collapse-message {
+    animation: collapse-message 0.8s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+.collapsed-message {
+    height: 0;
+    position: absolute;
+    bottom: 0;
+    width: 300px;
+}
 
 #chat-container {
     flex: 1;
@@ -251,6 +308,7 @@ a, .btn-link {
     position: relative;
     align-items: stretch;
     flex: 1;
+    overflow: hidden;
 }
 
 .group-count {
@@ -264,7 +322,11 @@ a, .btn-link {
 
 .chat-box-inner {
     position: absolute;
-    bottom: 0;
+    bottom: 8px;
+    left: 8px;
+}
+
+.chat-box--message {
 }
 
 #embed-above-the-fold {
@@ -279,3 +341,8 @@ a, .btn-link {
 #embed-above-the-fold > * {
 
 }
+
+.slide-in-bottom {
+    animation: slide-in-bottom 0.7s cubic-bezier(.42,.06,.38,.44) both;
+}
+

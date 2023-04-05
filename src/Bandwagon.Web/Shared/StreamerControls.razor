@@ -1,0 +1,43 @@
+﻿
+@inject OrgCircuitProvider OrgCircuitProvider
+@inject LiveChatCircuitProvider LiveChatCircuitProvider
+
+@if(_orgCircuit is null)
+{
+    return;
+}
+
+<div>
+    Streamer
+</div>
+<div>
+    <label>
+        <input type="checkbox" @bind="_orgCircuit.GroupingEnabled" /> Enable Grouping
+    </label>
+</div>
+@if(_liveChatCircuit is not null)
+{
+    <div>
+        <label>
+            <input type="number" step="0.05" @bind="_liveChatCircuit.Messages.MessageDistanceThreshold" min="0.1" max="1" /> Distance Threshold
+        </label>
+    </div>
+}
+
+@code {
+    OrgCircuit? _orgCircuit;
+    ILiveChatCircuit? _liveChatCircuit;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _orgCircuit = await OrgCircuitProvider.GetAsync();
+        _liveChatCircuit = await LiveChatCircuitProvider.GetAsync();
+
+        StateHasChanged();
+    }
+}

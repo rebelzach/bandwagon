@@ -1,12 +1,8 @@
 ﻿@page "/embed/above-fold"
 
-@inject UserCircuitProvider SessionStore
-@inject OrgCircuitProvider OrgSessionStore
-@inject IEmbed Embed
-@inject IOrgClient OrgClient
-@inject IUserClient UserClient
+@inject UserCircuitProvider UserCircuitProvider
 
-@if (_orgSession is null || _userSession?.OrgUser is null)
+@if (_userCircuit?.OrgUser is null)
 {
     return;
 }
@@ -17,14 +13,9 @@
         <ChatBox />
     </div>
     <div>
-        @if (_userSession.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
+        @if (_userCircuit.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
         {
-            <div>
-                Streamer
-            </div>
-            <label>
-                <input type="checkbox" @bind="_orgSession.GroupingEnabled" /> Enable Grouping
-            </label>
+            <StreamerControls />
         }
         else
         {
@@ -32,7 +23,7 @@
                 Chatter
             </div>
             <label>
-                <input type="checkbox" @bind="_userSession.ShowGrouping" /> Show Grouping
+                <input type="checkbox" @bind="_userCircuit.ShowGrouping" /> Show Grouping
             </label>
         }
     </div>
@@ -40,8 +31,7 @@
 
 @code {
 
-    UserCircuit? _userSession;
-    OrgCircuit? _orgSession;
+    UserCircuit? _userCircuit;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -50,35 +40,7 @@
             return;
         }
 
-        _userSession = await SessionStore.GetAsync();
-        _orgSession = await OrgSessionStore.GetAsync();
-
-        await OrgClient.SubscribeAsync(org =>
-        {
-            InvokeAsync(() =>
-            {
-                _orgSession.Org = org;
-                StateHasChanged();
-            });
-        });
-
-        await UserClient.SubscribeUserAsync(user =>
-        {
-            InvokeAsync(() =>
-            {
-                _userSession.User = user;
-                StateHasChanged();
-            });
-        });
-
-        await UserClient.SubscribeOrgUserAsync(user =>
-        {
-            InvokeAsync(() =>
-            {
-                _userSession.OrgUser = user;
-                StateHasChanged();
-            });
-        });
+        _userCircuit = await UserCircuitProvider.GetAsync();
 
         StateHasChanged();
     }

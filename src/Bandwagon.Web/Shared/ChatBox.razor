@@ -1,23 +1,57 @@
-﻿
-@inject LiveChatCircuitProvider LiveChatProvider
+﻿@inject LiveChatCircuitProvider LiveChatProvider
 
-<div class="chat-box">
-    <div class="chat-box-inner">
-        @if (LiveChat?.Messages is not null)
+@if (LiveChat?.Messages is not null)
+{
+    HashSet<MessageGroup> selectedGroups = new(LiveChat.Messages.Groups);
+    @foreach (var message in LiveChat.Messages.RecentMessages)
+    {
+        if (message.Group is null || !selectedGroups.Contains(message.Group))
         {
-            @foreach (var message in LiveChat.Messages.RecentMessages.Take(10))
+            continue;
+        }
+
+        <div @key=message class="collapsed-message">
+            <div class="send-to-group">
+                @message.Message.DisplayName: @ReplaceEmotes(message.Message)
+            </div>
+        </div>
+    }
+    <div class="chat-box">
+        <div class="chat-box-inner">
+            @foreach (var message in LiveChat.Messages.RecentMessages)
             {
-                <div>
-                    @*<div>message.DisplayName: @ReplaceEmotes(message)</div>*@
-                    <div>@message.DisplayName: @message.Message</div>
+                var addClass = "slide-in-bottom";
+                if (message.Group is not null && !selectedGroups.Contains(message.Group))
+                {
+                    //Normal
+                }
+                else if (message.Group is not null && SeenMessages.Contains(message))
+                {
+                    addClass = "collapse-message";
+                }
+                else if (message.Group is not null)
+                {
+                    continue;
+                }
+                else
+                {
+                    SeenMessages.Add(message);
+                }
+
+                var addClass2 = message.Group is null ? "" : "send-to-group";
+                <div @key=message class="chat-box--message @addClass">
+                    <div class="@addClass2">
+                        @message.Message.DisplayName: @ReplaceEmotes(message.Message)
+                    </div>
                 </div>
             }
-        }
+        </div>
     </div>
-</div>
+}
 
 @code {
     ILiveChatCircuit? LiveChat;
+    HashSet<CollectedMessage> SeenMessages = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -27,5 +61,20 @@
         LiveChat = await LiveChatProvider.GetAsync();
 
         LiveChat.Updated += () => InvokeAsync(() => StateHasChanged());
+    }
+
+    private MarkupString ReplaceEmotes(IChatMessage m)
+    {
+        var s = m.Message;
+        var p = 0;
+        var b = new StringBuilder();
+        foreach (var e in m.EmoteSet.Emotes.OrderBy(e => e.StartIndex))
+        {
+            b.Append(s[p..((int)e.StartIndex)]);
+            b.Append($"<img class='message-emote' src='{e.ImageUrl}'>");
+            p = (int)e.EndIndex + 1;
+        }
+        b.Append(s[p..]);
+        return (MarkupString)b.ToString();
     }
 }
