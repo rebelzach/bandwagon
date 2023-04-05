@@ -3,19 +3,6 @@
 @if (LiveChat?.Messages is not null)
 {
     HashSet<MessageGroup> selectedGroups = new(LiveChat.Messages.Groups);
-    @foreach (var message in LiveChat.Messages.RecentMessages)
-    {
-        if (message.Group is null || !selectedGroups.Contains(message.Group))
-        {
-            continue;
-        }
-
-        <div @key=message class="collapsed-message">
-            <div class="send-to-group">
-                @message.Message.DisplayName: @ReplaceEmotes(message.Message)
-            </div>
-        </div>
-    }
     <div class="chat-box">
         <div class="chat-box-inner">
             @foreach (var message in LiveChat.Messages.RecentMessages)
@@ -41,7 +28,7 @@
                 var addClass2 = message.Group is null ? "" : "send-to-group";
                 <div @key=message class="chat-box--message @addClass">
                     <div class="@addClass2">
-                        @message.Message.DisplayName: @ReplaceEmotes(message.Message)
+                        <span class="chat-box--message--name">@message.Message.DisplayName</span> @ReplaceEmotes(message.Message)
                     </div>
                 </div>
             }

@@ -1,16 +1,14 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
 * {
     box-sizing: border-box;
 }
 
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
+    font-weight: 400;
     height: 100%;
     margin: 0;
-}
-
-body {
-    padding: 8px;
+    padding: 0;
 }
 
 h1:focus {
@@ -162,6 +160,64 @@ a, .btn-link {
     }
 }
 
+@keyframes circle {
+    0% {
+        transform: rotate(0deg) translate(-165px) rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg) translate(-165px) rotate(-360deg);
+    }
+}
+
+
+@keyframes disco {
+    0% {
+        color: red;
+    }
+
+    10% {
+        color: green;
+    }
+
+    20% {
+        color: blue;
+    }
+
+    30% {
+        color: yellow;
+    }
+
+    40% {
+        color: orange;
+    }
+
+    50% {
+        color:purple;
+    }
+
+    60% {
+        color: brown;
+    }
+
+    70% {
+        color:pink;
+    }
+
+    80% {
+        color: lime;
+    }
+
+    90% {
+        color: cyan;
+    }
+
+    100% {
+        color: teal;
+    }
+} 
+
+
 .groups {
     position: relative;
     overflow: hidden;
@@ -173,19 +229,26 @@ a, .btn-link {
     top: 0;
     left: 0;
     width: 280px;
-    height: 150px;
+    height: 200px;
     -webkit-animation: puff-in-center 0.7s cubic-bezier(0.470, 0.000, 0.745, 0.715) both;
     animation: puff-in-center 0.7s cubic-bezier(0.470, 0.000, 0.745, 0.715) both;
     color: #fff;
     text-shadow: #000 1px 0 20px;
     font-size: 16px;
-/*    box-shadow: 0px -2px 15px rgba(34,34,34,0.3);
-        background-color: rgba(34,34,34,0.1);
-*/
     transition-property: left, top;
     transition-duration: 0.5s;
 
     overflow: hidden;
+}
+
+.dancing .group {
+    font-size: 35px;
+}
+
+.chat-container-video .group {
+    box-shadow: 0px -2px 15px rgba(34,34,34,0.3);
+    background-color: rgba(34,34,34,0.1);
+
 }
 
 .group-inner {
@@ -247,6 +310,41 @@ a, .btn-link {
     left: 310px;
 }
 
+.dancing .slot-1,
+.dancing .slot-2,
+.dancing .slot-3,
+.dancing .slot-4,
+.dancing .slot-5,
+.dancing .slot-6
+{
+    top: 200px;
+    left: 400px;
+    animation: circle 6s linear infinite, disco 8s linear infinite;
+}
+
+.dancing .slot-1 {
+}
+
+.dancing .slot-2 {
+    animation-delay: -1s;
+}
+
+.dancing .slot-3 {
+    animation-delay: -2s;
+}
+
+.dancing .slot-4 {
+    animation-delay: -3s;
+}
+
+.dancing .slot-5 {
+    animation-delay: -4s;
+}
+
+.dancing .slot-6 {
+    animation-delay: -5s;
+}
+
 .slot-7 {
     top: 170px;
     left: 610px;
@@ -294,17 +392,27 @@ a, .btn-link {
     width: 300px;
 }
 
-#chat-container {
+.chat-container {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-#chat-container > * {
+.chat-container > * {
     flex: 1;
 }
 
+.chat-container-video {
+    position: absolute;
+    width: 100vw; height: 100vh;
+    display: flex;
+    z-index: 1;
+    pointer-events: none;
+}
+
 .chat-box {
+    border-top: #333 solid 1px;
+    border-bottom: #333 solid 1px;
     position: relative;
     align-items: stretch;
     flex: 1;
@@ -322,11 +430,25 @@ a, .btn-link {
 
 .chat-box-inner {
     position: absolute;
-    bottom: 8px;
-    left: 8px;
+    bottom: 10px;
+    left: 15px;
 }
 
 .chat-box--message {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 15px;
+}
+
+.chat-box--message--name {
+    color: rgba(255, 255, 255, 0.7);
+    padding-right: 10px;
+}
+
+.message-emote {
+    display: inline-block;
+    vertical-align: middle;
+    height: 1.6rem;
 }
 
 #embed-above-the-fold {

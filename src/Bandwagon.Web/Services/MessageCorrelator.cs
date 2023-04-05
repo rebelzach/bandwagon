@@ -40,8 +40,8 @@ public class MessageCorrelator
             return null;
 
         var group = new MessageGroup(matches,
-            matches.Select(m => m.Message.TmiSentTs).Min(),
-            matches.Select(m => m.Message.TmiSentTs).Max());
+            testMessage.Message.TmiSentTs, // When it became a group
+            testMessage.Message.TmiSentTs);
 
         matches.ForEach(m => m.Group = group);
 
