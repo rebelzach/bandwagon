@@ -10,8 +10,17 @@ public class OrgCircuit : ISharedCircuit
 
     public event Action<OrgCircuit>? Updated;
 
-    private bool _groupingEnabled = true;
+    private bool _isDanceParty = false;
+    public bool IsDanceParty { 
+        get => _isDanceParty; 
+        set
+        {
+            _isDanceParty = value;
+            Updated?.Invoke(this);
+        }
+    }
 
+    private bool _groupingEnabled = true;
     public bool GroupingEnabled { 
         get => _groupingEnabled; 
         set

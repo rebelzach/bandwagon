@@ -1,37 +1,39 @@
 ﻿@page "/embed/above-fold"
 
 @inject UserCircuitProvider UserCircuitProvider
+@inject OrgCircuitProvider OrgCircuitProvider
 
-@if (_userCircuit?.OrgUser is null)
+@if (_orgCircuit?.Org is null || _userCircuit?.OrgUser is null)
 {
     return;
 }
 
 <div id="embed-above-the-fold">
     <div class="chat-container">
-        <ChatGroups />
+        @if (_orgCircuit.GroupingEnabled && !_userCircuit.ShowGroupingOnVideo)
+        {
+            <ChatGroups />
+        }
         <ChatBox />
     </div>
-    <div>
-        @if (_userCircuit.OrgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false)
+    <details class="chat-controls">
+        <summary><i class="bi bi-gear-fill"></i></summary>
+        <div class="app-title">Bandwagon</div>
+        <h2>Chat Display Settings</h2>
+        <label>
+            <input type="checkbox" @bind="_userCircuit.ShowGroupingOnVideo" /> Groups in Video Overlay
+        </label>
+        @if (_userCircuit.IsOrgAdmin)
         {
+            <h2>Streamer Controls</h2>
             <StreamerControls />
         }
-        else
-        {
-            <div>
-                Chatter
-            </div>
-            <label>
-                <input type="checkbox" @bind="_userCircuit.ShowGrouping" /> Show Grouping
-            </label>
-        }
-    </div>
+    </details>
 </div>
 
 @code {
-
     UserCircuit? _userCircuit;
+    OrgCircuit? _orgCircuit;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -41,6 +43,10 @@
         }
 
         _userCircuit = await UserCircuitProvider.GetAsync();
+        _userCircuit.Updated += c => InvokeAsync(StateHasChanged);
+
+        _orgCircuit = await OrgCircuitProvider.GetAsync();
+        _orgCircuit.Updated += c => InvokeAsync(StateHasChanged);
 
         StateHasChanged();
     }

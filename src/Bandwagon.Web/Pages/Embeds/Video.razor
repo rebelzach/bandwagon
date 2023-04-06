@@ -1,7 +1,44 @@
 ﻿
 @page "/embed/video"
 
+@inject UserCircuitProvider UserCircuitProvider
+@inject OrgCircuitProvider OrgCircuitProvider
+
 <HackathonSampleVideo />
+
+@if (_orgCircuit?.Org is null || _userCircuit?.OrgUser is null)
+{
+    return;
+}
+
 <div class="chat-container chat-container-video">
-    <ChatGroups />
+    @if (_orgCircuit.IsDanceParty)
+    {
+        <DanceParty />
+    }
+    else if (_orgCircuit.GroupingEnabled && _userCircuit.ShowGroupingOnVideo)
+    {
+        <ChatGroups />
+    }
 </div>
+
+@code {
+    UserCircuit? _userCircuit;
+    OrgCircuit? _orgCircuit;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _userCircuit = await UserCircuitProvider.GetAsync();
+        _userCircuit.Updated += c => InvokeAsync(StateHasChanged);
+
+        _orgCircuit = await OrgCircuitProvider.GetAsync();
+        _orgCircuit.Updated += c => InvokeAsync(StateHasChanged);
+
+        StateHasChanged();
+    }
+}

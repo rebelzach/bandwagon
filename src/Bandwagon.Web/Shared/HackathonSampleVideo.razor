@@ -19,7 +19,7 @@
         IPlayback? chatPlayback = null;
 
         // Admin users can control playback
-        if (userCircuit.OrgUser?.IsAdmin() ?? false)
+        if (userCircuit.IsOrgAdmin)
         {
             var chatCircuit = await LiveChatProvider.GetAsync();
             if (chatCircuit is PrerecordedLiveChatCircuit prerecordedChat)

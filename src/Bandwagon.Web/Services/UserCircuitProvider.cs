@@ -50,6 +50,8 @@ public class UserCircuitProvider
         {
             circuit.User = user;
             circuit.OrgUser = orgUser;
+            var isAdmin = orgUser.RoleConnection?.Nodes?.Any(n => n.Slug == "admin") ?? false;
+            circuit.IsOrgAdmin = isAdmin;
         }
         return circuit;
     }

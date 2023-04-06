@@ -8,16 +8,25 @@ public class UserCircuit : ISharedCircuit
     {
     }
 
-    public event Action<UserCircuit>? SessionUpdated;
+    public event Action<UserCircuit>? Updated;
 
-    private bool _showGrouping = true;
-
-    public bool ShowGrouping { 
-        get => _showGrouping; 
+    private bool _showGroupingOnVideo = false;
+    public bool ShowGroupingOnVideo { 
+        get => _showGroupingOnVideo; 
         set
         {
-            _showGrouping = value;
-            SessionUpdated?.Invoke(this);
+            _showGroupingOnVideo = value;
+            Updated?.Invoke(this);
+        }
+    }
+
+    private bool _isAdmin = true;
+    public bool IsOrgAdmin { 
+        get => _isAdmin; 
+        set
+        {
+            _isAdmin = value;
+            Updated?.Invoke(this);
         }
     }
 
@@ -27,7 +36,7 @@ public class UserCircuit : ISharedCircuit
         set
         {
             _user = value;
-            SessionUpdated?.Invoke(this);
+            Updated?.Invoke(this);
         }
     }
 
@@ -37,7 +46,7 @@ public class UserCircuit : ISharedCircuit
         set
         {
             _orgUser = value;
-            SessionUpdated?.Invoke(this);
+            Updated?.Invoke(this);
         }
     }
 }

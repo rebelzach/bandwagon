@@ -8,23 +8,24 @@
     var visibilityStyle = "";
     if (!Visible)
         visibilityStyle = "display: none;";
+
+    var groups = LiveChat.Messages.Groups;
+    var groupsClass = groups.Any() ? "" : "groups--no-data";
 }
 
-<div class="groups dancing" style="@visibilityStyle">
+<div class="groups @groupsClass" style="@visibilityStyle">
     @{
         var slotIndex = 1;
     }
     @foreach (var group in LiveChat.Messages.Groups)
     {
-        var cooldownMs = 10000.0;
+        var cooldownMs = LiveChat.Messages.GroupCooldownSeconds * 1000;
         var opacity = (cooldownMs - (LiveChat.CurrentTimestampMs - group.LastMessageAddedAt)) / cooldownMs;
         if (opacity < 0.0)
         {
             continue;
         }
         var style = $"opacity: {opacity};";
-        style = "";// For dancing, add individual messages and set the animation delay as an offset, might be good as separate component limit to only first emote and name
-
         <div @key=group class="group slot-@slotIndex" style="@style">
             <div class="group-inner">
                 @foreach (var collectedMessage in group.Messages.TakeLast(10))

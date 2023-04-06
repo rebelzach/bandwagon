@@ -1,10 +1,34 @@
 ﻿
 @page "/"
+@inject UserCircuitProvider UserCircuitProvider
 
 @* 
     This is a test page that shows the different Embed zones for quick testing
 *@
-
 <iframe src="/embed/video" width="960" height="540" frameborder="0" scrolling="no"></iframe>
+@if(_userCircuit is not null)
+{
+    <div>
+        <label>
+            <input type="checkbox" @bind="_userCircuit.IsOrgAdmin" /> Is Streamer
+        </label>
+    </div>
+}
 <iframe src="/embed/above-fold" width="960" height="540" frameborder="0" scrolling="no"></iframe>
 
+@code {
+    UserCircuit? _userCircuit;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _userCircuit = await UserCircuitProvider.GetAsync();
+        _userCircuit.Updated += c => InvokeAsync(StateHasChanged);
+
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,60 @@
+﻿
+@inject LiveChatCircuitProvider LiveChatProvider
+
+@{
+    if (LiveChat is null)
+        return;
+}
+
+<div class="dancing">
+    @{
+        var slotIndex = 1;
+    }
+    @foreach (var collectedMessage in messages)
+    {
+        // For dancing, add individual messages and set the animation delay as an offset, might be good as separate component limit to only first emote and name
+        var style = $"animation-delay: {slotIndex * 300}ms;";
+        var message = collectedMessage.Message;
+        <div @key="collectedMessage" class="dance-message" style="@style">
+            <span class="dance-message--name">@message.DisplayName:</span><br>
+            <span class="dance-message--text">@ReplaceEmotes(message)</span>
+        </div>
+        slotIndex += 3;
+    }
+</div>
+
+@code {
+    IEnumerable<CollectedMessage> messages = Enumerable.Empty<CollectedMessage>();
+
+    [Parameter]
+    public bool Visible { get; set; } = true;
+
+    ILiveChatCircuit? LiveChat;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        LiveChat = await LiveChatProvider.GetAsync();
+
+        LiveChat.Updated += () => InvokeAsync(() => StateHasChanged());
+
+        messages = LiveChat.Messages.Groups.SelectMany(g => g.Messages.Take(20)).OrderBy(a => Guid.NewGuid()).ToList();
+    }
+
+    private MarkupString ReplaceEmotes(IChatMessage m)
+    {
+        var s = m.Message;
+        var p = 0;
+        var b = new StringBuilder();
+        foreach (var e in m.EmoteSet.Emotes.OrderBy(e => e.StartIndex))
+        {
+            b.Append(s[p..((int)e.StartIndex)]);
+            b.Append($"<img class='message-emote' src='{e.ImageUrl}'>");
+            p = (int)e.EndIndex + 1;
+        }
+        b.Append(s[p..]);
+        return (MarkupString)b.ToString();
+    }
+}
